@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Home(work) by a.syadiq with Cherry Chan. Conversations with the custodians of Goodman Arts Centre, broken into grains of sound, shifting pattern and smeared frames.">
+<title>Home(work)</title>
+<style>
+@font-face { font-family: "Fraunces"; src: url("fonts/fraunces-latin-full-normal.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url("fonts/fraunces-latin-full-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "Instrument Sans"; src: url("fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Instrument Sans"; src: url("fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url("fonts/space-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url("fonts/space-mono-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+</style>
+<style>
+/* Layout: one full-bleed screen. The image is the floor; type sits on it like signage in a corridor. */
+:root {
+  --night: #2a1d29;        /* plum, the darkest cell of the pattern */
+  --shirt: #c9dcec;        /* uniform blue */
+  --wall: #d8b48c;         /* the room's beige wall */
+  --badge: #f2c200;        /* name badge yellow */
+  --ink: #eef3f7;
+  --dim: rgba(201, 220, 236, .55);
+  --line: rgba(201, 220, 236, .22);
+  --display: "Fraunces", Georgia, serif;
+  --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Space Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+h1, h2, p { margin: 0; }
+[hidden] { display: none !important; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body {
+  background: var(--night); color: var(--ink);
+  font-family: var(--body); font-size: 12px; overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+#stage { position: fixed; inset: 0; touch-action: none; cursor: crosshair; }
+#stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#vid, #vidc, #wordc { display: none; }
+.veil { position: fixed; left: 0; right: 0; z-index: 1; pointer-events: none; }
+.veil.t { top: 0; height: 110px; background: linear-gradient(rgba(42, 29, 41, .7), rgba(42, 29, 41, 0)); }
+.veil.b { bottom: 0; height: 46vh; background: linear-gradient(rgba(42, 29, 41, 0), rgba(42, 29, 41, .55) 45%, rgba(42, 29, 41, .85)); }
+
+/* ---------- chrome ---------- */
+.chrome {
+  position: fixed; left: 0; right: 0; z-index: 3; pointer-events: none;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { top: 0; padding-block: calc(14px + env(safe-area-inset-top, 0px)) 0; }
+.mark { font-family: var(--display); font-style: italic; font-size: 18px; letter-spacing: .01em; color: var(--ink); mix-blend-mode: difference; }
+.mark small { font-family: var(--mono); font-style: normal; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin-left: 10px; }
+.tools { display: flex; gap: 6px; pointer-events: auto; }
+button {
+  font: inherit; white-space: nowrap; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink); background: rgba(42, 29, 41, .55); border: 1px solid var(--line);
+  padding: 7px 10px; border-radius: 0; cursor: pointer; backdrop-filter: blur(6px);
+}
+button:hover { border-color: var(--shirt); }
+button:focus-visible { outline: 2px solid var(--badge); outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--shirt); color: var(--night); }
+
+/* ---------- surfaced voice ---------- */
+#voice {
+  position: fixed; z-index: 2; pointer-events: none;
+  left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+  max-width: 30ch;
+  transition: opacity .9s ease, filter .9s ease, transform .9s ease;
+  opacity: 0; filter: blur(8px); transform: translateY(6px);
+}
+#voice.on { opacity: 1; filter: blur(0); transform: none; }
+#voice .who { font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--badge); margin-bottom: 10px; display: flex; gap: 10px; align-items: center; }
+#voice .who::before { content: ""; width: 7px; height: 7px; background: var(--badge); display: inline-block; }
+#voice p {
+  font-family: var(--display); font-style: italic; font-weight: 400;
+  font-size: clamp(24px, 3.4vw, 46px); line-height: 1.12; text-wrap: balance;
+  color: var(--ink); text-shadow: 0 0 24px rgba(42, 29, 41, .9), 0 0 2px rgba(42, 29, 41, .9);
+}
+
+/* ---------- timeline ---------- */
+.bottom {
+  bottom: 0; flex-direction: column; align-items: stretch; gap: 8px;
+  padding-block: 0 calc(14px + env(safe-area-inset-bottom, 0px));
+}
+.readout { display: flex; justify-content: space-between; gap: 12px; color: var(--dim); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.readout b { color: var(--ink); font-weight: 400; }
+#tl { position: relative; height: 22px; }
+#tl .seg { position: absolute; top: 7px; height: 8px; background: var(--shirt); opacity: .5; }
+#tl .tick { position: absolute; top: 9px; width: 1px; height: 4px; background: var(--dim); }
+#tl .base { position: absolute; left: 0; right: 0; top: 11px; height: 1px; background: var(--line); }
+#tl .head { position: absolute; top: 0; width: 1px; height: 22px; background: var(--badge); transform: translateX(-.5px); }
+#tl .head::after { content: ""; position: absolute; top: -3px; left: -3px; width: 7px; height: 7px; background: var(--badge); }
+
+/* ---------- index drawer ---------- */
+#index {
+  position: fixed; z-index: 5; top: 0; right: 0; bottom: 0; width: min(440px, 100%);
+  background: rgba(42, 29, 41, .94); border-left: 1px solid var(--line);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding-block: calc(16px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px));
+  padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+#index header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+#index h2 { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 26px; }
+#index ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+#index li button {
+  width: 100%; text-align: left; display: grid; grid-template-columns: 44px 1fr; gap: 12px;
+  text-transform: none; letter-spacing: 0; font-size: 12px; line-height: 1.5;
+  background: transparent; border: 0; border-top: 1px solid var(--line); padding: 10px 0; backdrop-filter: none;
+}
+#index li button:hover span:last-child { color: var(--badge); }
+#index li .t { color: var(--dim); font-variant-numeric: tabular-nums; font-size: 10px; padding-top: 2px; }
+#index li.cam .t { color: var(--badge); }
+#index .legend { color: var(--dim); font-size: 10px; line-height: 1.6; margin-bottom: 16px; max-width: 46ch; }
+#index .legend i { font-style: normal; color: var(--badge); }
+
+/* ---------- threshold ---------- */
+#door {
+  position: fixed; inset: 0; z-index: 6; display: flex; align-items: flex-end;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px calc(40px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, rgba(42, 29, 41, .92) 0%, rgba(42, 29, 41, .55) 55%, rgba(42, 29, 41, .15) 100%);
+  transition: opacity 1.2s ease;
+}
+#door.gone { opacity: 0; pointer-events: none; }
+.door-in { display: grid; gap: 22px; max-width: 640px; }
+.door-in .eyebrow { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--badge); }
+.door-in h1 { font-family: var(--display); font-weight: 400; font-size: clamp(54px, 11vw, 132px); line-height: .86; letter-spacing: -.02em; }
+.door-in h1 em { font-style: italic; color: var(--shirt); }
+.door-in p { font-size: 12.5px; line-height: 1.7; color: var(--shirt); max-width: 52ch; }
+.door-in p i { font-family: var(--display); font-size: 1.15em; color: var(--ink); }
+.door-in .find { font-size: 10.5px; line-height: 1.6; letter-spacing: .04em; font-weight: 400; color: var(--ink); max-width: 60ch; }
+.door-in .credit { font-family: var(--display); font-style: italic; font-size: 15px; color: var(--shirt); }
+.door-in ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: 10.5px; color: var(--dim); letter-spacing: .04em; }
+.door-in ul b { color: var(--ink); font-weight: 400; }
+.door-in .row { display: flex; gap: 10px; flex-wrap: wrap; }
+#enter { font-size: 11px; padding: 14px 18px; background: var(--badge); color: var(--night); border-color: var(--badge); }
+#enter:hover { background: var(--ink); border-color: var(--ink); }
+#enter[disabled] { opacity: .6; cursor: progress; }
+
+@media (max-width: 560px) {
+  .mark small { display: none; }
+  .mark { font-size: 15px; white-space: nowrap; }
+  .tools { gap: 4px; }
+  .tools button { padding: 6px 7px; font-size: 9px; letter-spacing: .08em; }
+  #voice { bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #voice, #door { transition: none; }
+}
+/* Fraunces at its softest, slightly wonky setting */
+h1, #voice p, .mark, .credit, #index h2, .door-in p i { font-variation-settings: "SOFT" 100, "WONK" 1; }
+.door-in h1 { font-weight: 340; letter-spacing: -.035em; }
+#voice p { font-weight: 360; }
+.door-in p { font-size: 15px; line-height: 1.55; }
+#index li button { font-family: var(--body); }
+button, .readout, .eyebrow, #voice .who { font-family: var(--mono); }
+</style>
+
+</head>
+<body>
+<div id="stage" aria-label="Interactive audiovisual piece. Move to travel through the recording; hold still to hear a voice."></div>
+<video id="vid" muted loop playsinline autoplay preload="auto"><source src="media/cut.mp4" type="video/mp4"><source src="media/cut.webm" type="video/webm"></video>
+
+<div class="veil t"></div><div class="veil b"></div>
+<div class="chrome top">
+  <div class="mark">Home(work) <small>Goodman Arts Centre</small></div>
+  <div class="tools">
+    <button id="patBtn" type="button" title="Change the bit pattern (P)">Pattern 1</button>
+    <button id="idxBtn" type="button" aria-expanded="false" aria-controls="index">Index</button>
+    <button id="snd" type="button" aria-pressed="false">Sound off</button>
+  </div>
+</div>
+
+<div id="voice" aria-live="polite"><div class="who" id="who"></div><p id="vtext"></p></div>
+
+<div class="chrome bottom">
+  <div class="readout">
+    <span id="state">drifting</span>
+    <span><b id="clock">00:00</b> / 03:13</span>
+    <span id="hour"></span>
+  </div>
+  <div id="tl"><div class="base"></div></div>
+</div>
+
+<aside id="index" hidden aria-label="Index of everything said">
+  <header><h2>Everything said</h2><button id="idxClose" type="button">Close</button></header>
+  <p class="legend">Three minutes and thirteen seconds. Lines marked <i>yellow</i> are the two custodians, on camera. The rest is a voice heard off camera, someone who studied here and now works here. Choose a line to send the piece there.</p>
+  <ol id="idxList"></ol>
+</aside>
+
+<section id="door">
+  <div class="door-in">
+    <div class="eyebrow">Goodman Arts Centre &middot; The Custodians</div>
+    <h1>Home(<em>work</em>)</h1>
+    <p><i>Home(work)</i> returns our attention to the custodians who hold Goodman together. Conversations broken into grains of sound, shifting pattern and smeared frames. Their voices drift and fade, the way their work often goes unseen, a rhythm of care.</p>
+    <p class="find">Seek the installations at Blk G, Blk B and Blk O on 24 Oct 2026, 4pm &ndash; 10pm.</p>
+    <ul>
+      <li><b>Move</b> &nbsp;to travel through the recording</li>
+      <li><b>Hold still</b> &nbsp;and a voice comes through</li>
+      <li><b>Click</b> &nbsp;to change the pattern</li>
+    </ul>
+    <div class="row">
+      <button id="enter" type="button">Enter with sound</button>
+      <button id="quiet" type="button">Enter in silence</button>
+    </div>
+    <div class="credit">by a.syadiq with Cherry Chan</div>
+  </div>
+</section>
+
+<script src="vendor/hydra-synth-1.3.29.js"></script>
+<script src="vendor/tone-14.8.49.js"></script>
+<script src="vendor/total-serialism-2.10.4.min.js"></script>
+<script>
+(() => {
+'use strict';
+const DUR = 193.7;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- what was said (from the film's English subtitles) ----------
+const L = (s, e, who, t) => ({ s, e, who, t });
+const LINES = [
+  L(0, 7.5, 'cam', 'This place is big. Bigger than other places. Scared when we first came to work here.'),
+  L(7.5, 19, 'cam', "Didn't even know what the work was. After working, we figured it out. It's okay."),
+  L(19, 29.5, 'cam', 'When I first came to work, I was scared. How do you even work here?'),
+  L(29.5, 40, 'cam', "After a long time, I got used to it. The people here are good. It's a happy place."),
+  L(44.5, 48, 'voice', "When Ahmad was our lecturer, it was very open, he's kind"),
+  L(48, 49.5, 'voice', 'of built a fort, on his own.'),
+  L(49.5, 52.5, 'voice', 'And then, like Izam, his name is still on the hollow brick'),
+  L(52.5, 54, 'voice', 'walls on level one, right?'),
+  L(54, 56, 'voice', 'And that was his studio at that time.'),
+  L(56, 57, 'voice', 'It was the 3D.'),
+  L(57, 59, 'voice', 'They used to call it 3D installation space.'),
+  L(59, 64, 'voice', 'So I think, also the cylindrical structure that is'),
+  L(64, 66, 'voice', 'in near the amphitheatre.'),
+  L(66, 69, 'voice', "It's been there since we were students, but nobody knows who"),
+  L(69, 72, 'voice', "made it, why it's there, how it got there, what is the story behind it."),
+  L(72.5, 75, 'voice', 'From a time when I was still a student here.'),
+  L(75, 78, 'voice', 'Um, ceramic studio as well, corridors at Block E, like if you'),
+  L(78, 80, 'voice', "go there, you'll still see the"),
+  L(80, 82, 'voice', 'paint marks from when we were'),
+  L(82, 84, 'voice', "students. Yeah, I think that's also…"),
+  L(84, 85, 'voice', "That's very significant."),
+  L(85, 91, 'voice', "But it's also the corridors that actually are very meaningful"),
+  L(91, 92, 'voice', 'because it connects the spaces.'),
+  L(92, 95, 'voice', "That's where you meet everyone. So these chance encounters"),
+  L(95, 98, 'voice', 'along the corridors, you hear the drums in the background,'),
+  L(98, 100, 'voice', 'or you hear the singers…'),
+  L(100, 106, 'voice', 'These are things behind every, every studio, behind every door,'),
+  L(106, 109, 'voice', 'these are the people who have actually dedicated their time and'),
+  L(109, 114, 'voice', 'never gave up, to really be in the arts more than'),
+  L(114, 116, 'voice', 'anyone could have a capacity.'),
+  L(116, 117, 'voice', 'you know, and'),
+  L(117, 119, 'voice', '… and all the conversations that actually happen.'),
+  L(119, 123, 'voice', "Yeah, I think that is, that's really what Goodman"),
+  L(123, 125, 'voice', 'is. The life of Goodman now.'),
+  L(125.5, 129, 'cam', 'Working here is like freedom.'),
+  L(129, 133, 'cam', 'I work twelve hours. Twelve hours. I just started recently.'),
+  L(133, 139.5, 'cam', "My heart is here at work. Can't do much at home. But coming to work, I'm comfortable. All my friends are here."),
+  L(139.5, 143, 'cam', 'Like our home.'),
+  L(143, 152, 'cam', "Working here is like freedom. Other places control you. ‘Do this work at this hour.’"),
+  L(152, 156.5, 'cam', "But here it's not like that. It's friendly. Morning, morning. Afternoon, afternoon."),
+  L(156.5, 163, 'cam', 'Will definitely miss it. This place and the people we spend most of our time with.'),
+  L(163.5, 166, 'voice', '…actually the heartbeat of what Goodman is.'),
+  L(166.5, 169, 'voice', "It's the people that make this place, right?"),
+  L(169, 171.5, 'voice', "So, and that's the reason why we exist also."),
+  L(171.5, 174, 'voice', "So I think it's really space and people lah."),
+  L(174.5, 178, 'voice', "When it's sundown, when it's about"),
+  L(178, 181, 'voice', "dusk, that's also another magic moment."),
+  L(181, 183, 'voice', 'When we get the pastel skies here, right?'),
+  L(183, 187, 'voice', 'And then at about four, about four to five, we get the golden hour.'),
+  L(187, 189, 'voice', "It's… yeah."),
+  L(189, 190, 'voice', 'So that, that,'),
+  L(190, 191.5, 'voice', 'that is the switch.'),
+  L(191.5, 193.7, 'voice', 'But the mornings are the most energising for me.'),
+];
+const WHO = { cam: 'Custodian, on camera', voice: 'Voice from the corridors' };
+// on-camera footage lives in faces.mp4: 0–40s, then 125.5–163s joined at 40s
+const vidTimeFor = t => t < 40 ? t : (t >= 125.5 && t < 163 ? 40 + (t - 125.5) : null);
+const lineAt = t => {
+  let best = LINES[0], bd = 1e9;
+  for (const l of LINES) {
+    if (t >= l.s && t < l.e) return l;
+    const d = Math.min(Math.abs(t - l.s), Math.abs(t - l.e));
+    if (d < bd) { bd = d; best = l; }
+  }
+  return best;
+};
+const fmt = t => { t = Math.max(0, t); const m = Math.floor(t / 60), s = Math.floor(t % 60); return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); };
+
+// ---------- serial engine (Total Serialism) ----------
+const TS = window.TotalSerialism;
+const Rnd = TS ? TS.Stochastic : null, Alg = TS ? TS.Algorithmic : null;
+const shuffle = a => Rnd ? Rnd.shuffle(a) : a.slice().sort(() => Math.random() - .5);
+const euclid = (n, k, r) => Alg ? Alg.euclid(n, k, r || 0) : Array.from({ length: n }, (_, i) => ((i * k) % n) < k ? 1 : 0);
+const drunk = (len, step, lo, hi, start) => Rnd ? Rnd.drunk(len, step, lo, hi, start) : Array.from({ length: len }, (_, i) => Math.max(lo, Math.min(hi, start + Math.round((Math.random() - .5) * 2 * step * i ** .5))));
+let walk = [], walkI = 0, rhythm = euclid(16, 5), surfaceBars = euclid(8, 3, 1), patternSeq = shuffle([0, 1, 2, 3]), bar = 0;
+function newWalk(fromIndex) { walk = drunk(48, 3, 0, LINES.length - 1, fromIndex ?? Math.floor(Math.random() * LINES.length)); walkI = 0; }
+newWalk();
+
+// ---------- state ----------
+const S = {
+  mode: 'drift',           // drift | scrub | surface
+  head: Math.random() * DUR,
+  grainSize: .09,
+  lastMove: -1e9, armed: false,
+  reveal: .2, revealT: .2,
+  level: 0,
+  pattern: 0, cell: 9,
+  warm: 0, warmBase: 0,
+  focus: LINES[0],
+  sound: false,
+  driftPos: 0,
+  surfaceEnd: 0,
+};
+
+// ---------- time of day (the voice describes the light) ----------
+function hourMood() {
+  const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+  let label = 'after hours', w = 0;
+  if (h >= 6 && h < 9.5) { label = 'morning'; w = .45; }
+  else if (h >= 9.5 && h < 16) { label = 'daytime'; w = .15; }
+  else if (h >= 16 && h < 17.2) { label = 'golden hour'; w = 1; }
+  else if (h >= 17.2 && h < 19.6) { label = 'sundown'; w = .8; }
+  return { label: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' · ' + label, w };
+}
+const hourEl = document.getElementById('hour');
+function tickHour() { const m = hourMood(); S.warmBase = m.w; hourEl.textContent = m.label; }
+tickHour(); setInterval(tickHour, 30000);
+
+// ---------- canvases ----------
+const stage = document.getElementById('stage');
+const vid = document.getElementById('vid');
+// the footage arrives as colour on top and its cut-out matte below; recombine into one transparent frame
+const KW = 640, KH = 274;
+const kc = document.createElement('canvas'); kc.width = KW; kc.height = KH;
+const kctx = kc.getContext('2d');
+const kwork = document.createElement('canvas'); kwork.width = KW; kwork.height = KH * 2;
+const kwctx = kwork.getContext('2d', { willReadFrequently: true });
+let kReady = false, kLastT = -1;
+function keyFrame() {
+  if (vid.readyState < 2) return;
+  if (vid.currentTime === kLastT && kReady) return;
+  kLastT = vid.currentTime;
+  kwctx.drawImage(vid, 0, 0, KW, KH * 2);
+  const img = kwctx.getImageData(0, 0, KW, KH * 2), d = img.data, half = KW * KH * 4;
+  for (let o = 0; o < half; o += 4) d[o + 3] = d[o + half];
+  kctx.clearRect(0, 0, KW, KH);
+  kctx.putImageData(img, 0, 0, 0, 0, KW, KH);
+  kReady = true;
+}
+const vidc = document.createElement('canvas'); vidc.id = 'vidc';
+const wordc = document.createElement('canvas'); wordc.id = 'wordc';
+const vctx = vidc.getContext('2d');
+const wctx = wordc.getContext('2d');
+const tiny = document.createElement('canvas');
+const tctx = tiny.getContext('2d', { willReadFrequently: true });
+let out = document.createElement('canvas');
+stage.appendChild(out);
+let W = 0, H = 0, CW = 0, CH = 0;
+const GLYPH = { w: 11, h: 15 };
+
+function fitVideoRect() {
+  const vw = KW, vh = KH;
+  const s = Math.max(CW / vw * 1.08, Math.min((CH * .62) / vh, CW / vw * 1.6));
+  const dw = vw * s, dh = vh * s;
+  return [(CW - dw) / 2, (CH - dh) / 2, dw, dh];
+}
+function resize() {
+  W = innerWidth; H = innerHeight;
+  const scale = Math.min(1, 1400 / Math.max(W, H));   // keep the GPU calm on big screens
+  CW = Math.round(W * scale); CH = Math.round(H * scale);
+  out.width = CW; out.height = CH;
+  if (maskC) { /* fallback canvas keeps its own size */ }
+  vidc.width = CW; vidc.height = CH;
+  sizeMosh();
+  wordc.width = CW; wordc.height = CH;
+  GLYPH.w = W < 560 ? 8 : 11; GLYPH.h = Math.round(GLYPH.w * 1.38);
+  tiny.width = Math.ceil(CW / GLYPH.w); tiny.height = Math.ceil(CH / GLYPH.h);
+  S.cell = W < 560 ? 6 : 9;
+  if (hydra) hydra.setResolution(CW, CH);
+}
+
+// ---------- datamosh: the footage's own motion drags the last image along ----------
+// Like a video file with its keyframes removed: each macroblock keeps the old picture and only
+// receives motion, so the cleaners smear through themselves until a clean frame breaks through.
+const MB = 16;                                     // macroblock size in canvas pixels
+const MAXV = 9;                                    // motion range, in analysis pixels
+const moc = document.createElement('canvas');      // one pixel per block: R,G = motion, B = refresh
+const moctx = moc.getContext('2d');
+const lk = document.createElement('canvas');       // small luminance image for motion analysis
+const lkctx = lk.getContext('2d', { willReadFrequently: true });
+let MC = 1, MR = 1, prevLum = null, mvx = null, mvy = null, moImg = null, iframeLeft = 0, lastMo = 0, nextKey = 0;
+function sizeMosh() {
+  MC = Math.ceil(CW / MB); MR = Math.ceil(CH / MB);
+  moc.width = MC; moc.height = MR; lk.width = MC * 4; lk.height = MR * 4;
+  mvx = new Float32Array(MC * MR); mvy = new Float32Array(MC * MR);
+  moImg = moctx.createImageData(MC, MR); prevLum = null; iframeLeft = Math.max(iframeLeft, 4);
+}
+function keyframe(n) { iframeLeft = Math.max(iframeLeft, n || 6); }
+function estimateMotion() {
+  const w = MC * 4, h = MR * 4;
+  lkctx.clearRect(0, 0, w, h); lkctx.drawImage(vidc, 0, 0, w, h);
+  const d = lkctx.getImageData(0, 0, w, h).data;
+  const Lm = new Float32Array(w * h);
+  for (let i = 0, o = 0; i < Lm.length; i++, o += 4) Lm[i] = (d[o] * .3 + d[o + 1] * .55 + d[o + 2] * .15) * d[o + 3] / 65025;
+  const prev = prevLum || Lm;
+  const gain = S.mode === 'scrub' ? 5.5 : S.mode === 'surface' ? 3 : 4;
+  const leak = S.mode === 'surface' ? .05 : S.mode === 'scrub' ? .006 : .015;
+  const px = moImg.data;
+  for (let by = 0; by < MR; by++) for (let bx = 0; bx < MC; bx++) {
+    let a = 0, b = 0, c = 0, e = 0, f = 0, res = 0;
+    for (let yy = 0; yy < 4; yy++) {
+      const y = by * 4 + yy; if (y < 1 || y >= h - 1) continue;
+      for (let xx = 0; xx < 4; xx++) {
+        const x = bx * 4 + xx; if (x < 1 || x >= w - 1) continue;
+        const i = y * w + x;
+        const Ix = (Lm[i + 1] - Lm[i - 1]) * .5, Iy = (Lm[i + w] - Lm[i - w]) * .5, It = Lm[i] - prev[i];
+        a += Ix * Ix; b += Ix * Iy; c += Iy * Iy; e += Ix * It; f += Iy * It; res += Math.abs(It);
+      }
+    }
+    const det = a * c - b * b;
+    let vx = 0, vy = 0;
+    if (det > 1e-7) { vx = (-c * e + b * f) / det; vy = (b * e - a * f) / det; }
+    vx = Math.max(-3, Math.min(3, vx)); vy = Math.max(-3, Math.min(3, vy));
+    const k = by * MC + bx;
+    mvx[k] = mvx[k] * .9 + vx * gain * .3;            // vectors carry momentum: the smear keeps travelling
+    mvy[k] = mvy[k] * .9 + vy * gain * .3;
+    let r = 0;
+    if (iframeLeft > 0) r = 255;                        // a clean frame: everyone appears
+    else if (res / 16 > .045 && Math.random() < leak) r = 160;   // a block of new picture leaks through, coarse
+    const o = k * 4;
+    px[o] = 128 + Math.max(-127, Math.min(127, mvx[k] / MAXV * 127));
+    px[o + 1] = 128 + Math.max(-127, Math.min(127, mvy[k] / MAXV * 127));
+    px[o + 2] = r; px[o + 3] = 255;
+  }
+  moctx.putImageData(moImg, 0, 0);
+  prevLum = Lm;
+  if (iframeLeft > 0) iframeLeft--;
+}
+
+// draw the footage and the word-image made from it
+let glyphIdx = 0, lastWords = 0;
+function drawSources(now) {
+  const wasCam = S.onCam;
+  const onCam = S.onCam = vidTimeFor(S.head) != null;
+  if (onCam && !wasCam) keyframe(3);
+  vctx.clearRect(0, 0, CW, CH);
+  const firstKey = !kReady;
+  keyFrame();
+  if (kReady) {
+    if (firstKey) keyframe(8);
+    const [x, y, w, h] = fitVideoRect();
+    vctx.globalAlpha = onCam ? 1 : .7; vctx.drawImage(kc, x, y, w, h); vctx.globalAlpha = 1;
+  }
+  // while a cleaner is speaking, a clean frame breaks through every few seconds
+  if (S.mode === 'surface' && onCam && now > nextKey) { keyframe(4); nextKey = now + 2200 + Math.random() * 1800; }
+  if (now - lastMo > 33) { lastMo = now; estimateMotion(); }
+  if (now - lastWords < 70) return;             // words refresh ~14 fps
+  lastWords = now;
+  const tw = tiny.width, th = tiny.height;
+  tctx.drawImage(vidc, 0, 0, tw, th);
+  const px = tctx.getImageData(0, 0, tw, th).data;
+  let sum = 0, cnt = 0;
+  for (let o = 0; o < px.length; o += 16) { const b = (px[o] * .3 + px[o + 1] * .55 + px[o + 2] * .15) / 255; if (b > .04) { sum += b; cnt++; } }
+  const mean = cnt ? sum / cnt : .5;
+  wctx.clearRect(0, 0, CW, CH);
+  wctx.font = `400 ${Math.round(GLYPH.h * .82)}px "Space Mono", monospace`;
+  wctx.textBaseline = 'top';
+  const chars = S.focus.t.replace(/\s+/g, '').toUpperCase();
+  const n = chars.length;
+  glyphIdx = (glyphIdx + 1) % n;
+  let k = glyphIdx;
+  for (let j = 0; j < th; j++) {
+    for (let i = 0; i < tw; i++) {
+      const o = (j * tw + i) * 4;
+      const b = (px[o] * .3 + px[o + 1] * .55 + px[o + 2] * .15) / 255;
+      if (b < .04) continue;
+      const c = Math.abs(b - mean) * 4.2;
+      if (c < .18) continue;
+      wctx.globalAlpha = Math.min(1, c);
+      wctx.fillStyle = b > mean + .22 ? '#f2c200' : '#c9dcec';
+      wctx.fillText(chars[k % n], i * GLYPH.w, j * GLYPH.h);
+      k++;
+    }
+  }
+  wctx.globalAlpha = 1;
+}
+
+// ---------- visuals: Hydra (bitfield mask + fractal flame smoke) ----------
+let hydra = null, fallback = false;
+function setupHydra() {
+  hydra = new Hydra({ canvas: out, detectAudio: false, enableStreamCapture: false, makeGlobal: true, width: CW, height: CH, autoLoop: true });
+  // bit-pattern field, in the spirit of bitfolly: XOR / AND / OR on integer cell coordinates
+  setFunction({
+    name: 'bitfold', type: 'src',
+    inputs: [
+      { type: 'float', name: 'size', default: 9 },
+      { type: 'float', name: 'mode', default: 0 },
+      { type: 'float', name: 'thr', default: 4 },
+      { type: 'float', name: 'shift', default: 0 },
+    ],
+    glsl: `
+      vec2 g = floor(_st * resolution.xy / size);
+      float x = mod(g.x + floor(shift), 256.);
+      float y = mod(g.y + floor(shift * .37), 256.);
+      float a = x, b = y, p = 1., xr = 0., an = 0., orr = 0.;
+      for (int i = 0; i < 8; i++) {
+        float ba = mod(a, 2.), bb = mod(b, 2.);
+        xr += p * mod(ba + bb, 2.); an += p * ba * bb; orr += p * max(ba, bb);
+        a = floor(a / 2.); b = floor(b / 2.); p *= 2.;
+      }
+      float m = 11.;
+      float v0 = step(mod(xr, m), thr);
+      float v1 = (1. - step(.5, mod(an, 64.))) * step(mod(x + y, 13.), thr * 1.2 + 1.);
+      // ikat / harlequin: two offset lattices of lozenges, alternately filled, with nested
+      // stepped outlines and rows that slip sideways like resist-dyed warp threads
+      float P = 16., Q = 22.;
+      float slip = floor(fract(sin(g.y * 12.9898 + floor(shift * .15)) * 43758.5453) * 3.) - 1.;
+      vec2 gg = vec2(g.x + slip, g.y);
+      vec2 ca = vec2(mod(gg.x, P) - P * .5, mod(gg.y, Q) - Q * .5);
+      vec2 cb = vec2(mod(gg.x + P * .5, P) - P * .5, mod(gg.y + Q * .5, Q) - Q * .5);
+      float da = abs(ca.x) / (P * .5) + abs(ca.y) / (Q * .5);
+      float db = abs(cb.x) / (P * .5) + abs(cb.y) / (Q * .5);
+      float inA = step(da, 1.);
+      float dOwn = mix(db, da, inA);
+      float ring = fract(dOwn * 2.5);
+      float v2 = max(inA * step(.28, ring), step(ring, thr / m - .25));
+      float v3 = step(mod(orr + y * 3., m), thr);
+      float v = mode < .5 ? v0 : mode < 1.5 ? max(v1, step(m - .5, thr)) : mode < 2.5 ? v2 : v3;
+      return vec4(vec3(v), 1.);`
+  });
+  // fractal-flame-like smoke, in the spirit of bl4st: sinusoidal + swirl + spherical variations, log density
+  setFunction({
+    name: 'flame', type: 'src',
+    inputs: [
+      { type: 'float', name: 'amp', default: .5 },
+      { type: 'float', name: 'speed', default: .1 },
+      { type: 'float', name: 'warm', default: 0 },
+    ],
+    glsl: `
+      vec2 p = (_st - .5) * vec2(resolution.x / resolution.y, 1.) * 2.6;
+      float t = time * speed;
+      vec2 q = p; float d = 0.;
+      for (int i = 0; i < 7; i++) {
+        float fi = float(i);
+        q = vec2(sin(q.x * 1.6 + t + fi * .7), sin(q.y * 1.25 - t * .8 + fi * 1.3)) + .55 * vec2(q.y, -q.x);
+        float r2 = dot(q, q) + .12;
+        q = q / r2 * (.95 + .15 * sin(t * .5 + fi));
+        d += exp(-11. * abs(length(q) - .9 - .25 * sin(t + fi))) * 1.6;
+      }
+      d = d / 7.;
+      d = log(1. + d * (2. + amp * 10.)) / log(3. + amp * 10.);
+      vec3 cool = mix(vec3(.03, .02, .09), vec3(.56, .52, .93), smoothstep(.12, .7, d));
+      vec3 hot  = mix(vec3(.09, .03, .02), vec3(.96, .62, .25), smoothstep(.12, .7, d));
+      vec3 col = mix(cool, hot, warm);
+      col = mix(col, vec3(1., .96, .9), smoothstep(.72, 1., d) * .8);
+      float core = smoothstep(.0, .42, length(p * vec2(.65, 1.)));
+      return vec4(col * mix(.25, 1., core), 1.);`
+  });
+
+  s0.init({ src: vidc, dynamic: true });
+  s1.init({ src: wordc, dynamic: true });
+  s2.init({ src: moc, dynamic: true });
+
+  const lvl = () => S.level;
+  const cell = () => S.cell;
+  const pat = () => S.pattern;
+  const thr = () => 1.2 + S.reveal * 8.5 + S.level * 6 + (S.onCam ? 2 : 0) + (iframeLeft > 0 ? 6 : 0);
+  const shift = () => REDUCED ? 0 : time * (S.mode === 'scrub' ? 9 : 2.2);
+
+  // smoke with feedback
+  // pastel ground: dusty rose, mauve and lilac, warming to peach at golden hour
+  setFunction({
+    name: 'pastel', type: 'src',
+    inputs: [
+      { type: 'float', name: 'speed', default: .05 },
+      { type: 'float', name: 'warm', default: 0 },
+      { type: 'float', name: 'lvl', default: 0 },
+    ],
+    glsl: `
+      vec2 p = _st; float t = time * speed;
+      float n = sin(p.x * 3.1 + t) * .5 + sin(p.y * 2.3 - t * 1.3) * .5 + sin((p.x + p.y) * 4.7 + t * .7) * .3;
+      n = n * .3 + .5;
+      vec3 rose = vec3(.87, .74, .79), mauve = vec3(.70, .56, .64), lilac = vec3(.68, .63, .74), peach = vec3(.93, .79, .69);
+      vec3 c = mix(mauve, rose, smoothstep(.25, .8, n));
+      c = mix(c, lilac, smoothstep(.45, 1., p.y + .2 * sin(t + p.x * 2.)) * .45);
+      c = mix(c, peach, warm * .65 * smoothstep(.1, .9, 1. - p.y));
+      c *= .9 + lvl * .22;
+      return vec4(c, 1.);`
+  });
+  // stepped plum cells laid over it, like the pattern seen through the footage
+  setFunction({
+    name: 'plumcells', type: 'combine',
+    inputs: [{ type: 'float', name: 'amt', default: .55 }],
+    glsl: `
+      float v = _luminance(_c1.rgb);
+      vec3 plum = vec3(.29, .2, .28);
+      return vec4(mix(_c0.rgb, plum, v * amt), _c0.a);`
+  });
+  const bgCell = () => Math.round(S.cell * 1.5);
+  const bgThr = () => 2.2 + S.level * 9;                 // the voice opens more cells
+  const bgShift = () => REDUCED ? 0 : time * .9;
+  pastel(.05, () => S.warm, () => S.level)
+    .plumcells(bitfold(bgCell, pat, bgThr, bgShift), () => .42 + S.level * .25)
+    .out(o2);
+  // the mosh: previous picture, pushed by block motion, refreshed only where told
+  setFunction({
+    name: 'moshframe', type: 'src',
+    inputs: [
+      { type: 'sampler2D', name: 'prev', default: NaN },
+      { type: 'sampler2D', name: 'motion', default: NaN },
+      { type: 'sampler2D', name: 'fresh', default: NaN },
+      { type: 'float', name: 'ax', default: .01 },
+      { type: 'float', name: 'ay', default: .01 },
+      { type: 'float', name: 'cols', default: 80 },
+      { type: 'float', name: 'rows', default: 50 },
+      { type: 'float', name: 'decay', default: .996 },
+    ],
+    glsl: `
+      vec2 cell = vec2(cols, rows);
+      vec2 bs = (floor(_st * cell) + .5) / cell;
+      vec4 mv = texture2D(motion, bs);
+      vec2 v = (mv.rg - .5) * 2. * vec2(ax, ay);
+      vec4 p;
+      p.r = texture2D(prev, _st - v * 1.12).r;          // channels drift apart a little, like broken chroma
+      p.g = texture2D(prev, _st - v).g;
+      p.b = texture2D(prev, _st - v * .88).b;
+      p.a = texture2D(prev, _st - v).a;
+      p *= decay;
+      float full = step(.8, mv.b);
+      float coarse = step(.4, mv.b) * (1. - full);
+      vec2 q = floor(_st * cell * 3.) / (cell * 3.);    // leaked blocks arrive quantised
+      vec4 f = texture2D(fresh, mix(_st, q, coarse));
+      return mix(p, f, max(full, coarse));`
+  });
+  moshframe(o1, s2, s0,
+      () => MAXV / (MC * 4), () => MAXV / (MR * 4),
+      () => MC, () => MR,
+      () => S.mode === 'scrub' ? .998 : .996)
+    .out(o1);
+  // words fill the bits the footage doesn't
+  src(s1).mask(bitfold(cell, pat, thr, shift).invert()).out(o3);
+
+  src(o2).mult(solid(1, 1, 1), () => .92 - S.reveal * .1)
+    .layer(src(o1).saturate(.85).contrast(1.15).mask(bitfold(cell, pat, thr, shift)))
+    .add(src(o3), () => S.onCam ? .18 : .55 - S.reveal * .25)
+    .modulate(osc(6, .02, 0).rotate(1.2), () => S.mode === 'scrub' ? .004 : .0015)
+    .out(o0);
+}
+
+// 2D fallback if WebGL or Hydra cannot start
+let fctx = null, maskC = null, mctx = null;
+function setupFallback() {
+  fallback = true;
+  const fresh = document.createElement('canvas'); fresh.width = CW; fresh.height = CH;
+  out.replaceWith(fresh); out = fresh;
+  fctx = out.getContext('2d');
+  maskC = document.createElement('canvas'); mctx = maskC.getContext('2d');
+}
+function bitsAt(x, y, mode, thr) {
+  let xr = x ^ y, an = x & y, orr = x | y;
+  if (mode === 0) return (xr % 11) <= thr;
+  if (mode === 1) return (an % 64) === 0 && ((x + y) % 13) <= thr * 1.2 + 1;
+  if (mode === 2) {
+    const P = 16, Q = 22, m = (a, n) => ((a % n) + n) % n;
+    const ax = m(x, P) - P / 2, ay = m(y, Q) - Q / 2, bx = m(x + P / 2, P) - P / 2, by = m(y + Q / 2, Q) - Q / 2;
+    const da = Math.abs(ax) / (P / 2) + Math.abs(ay) / (Q / 2), db = Math.abs(bx) / (P / 2) + Math.abs(by) / (Q / 2);
+    const inA = da <= 1, ring = ((inA ? da : db) * 2.5) % 1;
+    return (inA && ring >= .28) || ring <= thr / 11 - .25;
+  }
+  return ((orr + y * 3) % 11) <= thr;
+}
+function drawFallback(now) {
+  const cw = Math.ceil(CW / S.cell), ch = Math.ceil(CH / S.cell);
+  maskC.width = cw; maskC.height = ch;
+  const img = mctx.createImageData(cw, ch);
+  const sh = REDUCED ? 0 : Math.floor(now / 1000 * (S.mode === 'scrub' ? 9 : 2.2));
+  const thr = 1.2 + S.reveal * 8.5 + S.level * 6;
+  for (let j = 0; j < ch; j++) for (let i = 0; i < cw; i++) {
+    const on = bitsAt((i + sh) & 255, (j + Math.floor(sh * .37)) & 255, S.pattern, thr);
+    img.data[(j * cw + i) * 4 + 3] = on ? 255 : 0;
+  }
+  mctx.putImageData(img, 0, 0);
+  const t = now / 1000;
+  fctx.globalCompositeOperation = 'source-over';
+  fctx.fillStyle = 'rgba(178,143,163,.25)'; fctx.fillRect(0, 0, CW, CH);
+  const warmCol = S.warm > .5 ? '237,201,176' : '222,189,201';
+  for (let i = 0; i < 3; i++) {
+    const gx = CW * (.5 + .3 * Math.sin(t * .2 + i * 2)), gy = CH * (.5 + .25 * Math.cos(t * .17 + i));
+    const g = fctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(CW, CH) * (.25 + S.level));
+    g.addColorStop(0, `rgba(${warmCol},.18)`); g.addColorStop(1, 'rgba(0,0,0,0)');
+    fctx.fillStyle = g; fctx.fillRect(0, 0, CW, CH);
+  }
+  fctx.save(); fctx.imageSmoothingEnabled = false;
+  const tmp = document.createElement('canvas'); tmp.width = CW; tmp.height = CH;
+  const t2 = tmp.getContext('2d'); t2.imageSmoothingEnabled = false;
+  t2.drawImage(vidc, 0, 0); t2.globalCompositeOperation = 'destination-in'; t2.drawImage(maskC, 0, 0, CW, CH);
+  fctx.globalCompositeOperation = 'lighter'; fctx.globalAlpha = .45 + S.reveal * .5; fctx.drawImage(tmp, 0, 0);
+  t2.globalCompositeOperation = 'source-over'; t2.clearRect(0, 0, CW, CH);
+  t2.drawImage(wordc, 0, 0); t2.globalCompositeOperation = 'destination-out'; t2.drawImage(maskC, 0, 0, CW, CH);
+  fctx.globalAlpha = .8 - S.reveal * .35; fctx.drawImage(tmp, 0, 0);
+  fctx.restore();
+}
+
+// ---------- sound: Tone.js ----------
+let buf = null, grainBus, panners = [], bed, clear, meter, master, loop, audioReady = false;
+async function setupAudio() {
+  await Tone.start();
+  buf = new Tone.ToneAudioBuffer();
+  await buf.load('media/voices.mp3');
+  master = new Tone.Gain(.9).toDestination();
+  meter = new Tone.Meter({ normalRange: true, smoothing: .75 });
+  master.connect(meter);
+  const verb = new Tone.Reverb({ decay: 7, wet: .42, preDelay: .02 });
+  const comp = new Tone.Compressor(-26, 3);
+  const hp = new Tone.Filter(150, 'highpass');
+  grainBus = new Tone.Gain(.75);
+  grainBus.chain(hp, comp, verb, master);
+  for (const p of [-.85, -.4, 0, .4, .85]) { const pn = new Tone.Panner(p); pn.connect(grainBus); panners.push(pn); }
+  // a slow bed made from the whole recording, stretched underneath everything
+  const lp = new Tone.Filter(700, 'lowpass');
+  bed = new Tone.GrainPlayer({ url: buf, loop: true, playbackRate: .22, grainSize: .32, overlap: .16, detune: -500, volume: -17 });
+  bed.chain(lp, verb);
+  // the line, heard plainly when you hold still
+  const cHp = new Tone.Filter(110, 'highpass');
+  const cComp = new Tone.Compressor(-22, 2.5);
+  const cVerb = new Tone.Reverb({ decay: 2.4, wet: .14 });
+  clear = new Tone.Player({ url: buf, fadeIn: .25, fadeOut: .7, volume: 2 });
+  clear.chain(cHp, cComp, cVerb, master);
+  await Promise.all([verb.ready, cVerb.ready]);
+  bed.start(undefined, Math.random() * DUR);
+  Tone.Transport.bpm.value = 84;
+  loop = new Tone.Loop(tick, '32n').start(0);
+  Tone.Transport.start('+0.05');
+  audioReady = true;
+}
+
+function grain(time, pos, dur, rate, amp) {
+  pos = Math.max(0, Math.min(DUR - dur - .01, pos));
+  const g = new Tone.ToneBufferSource({ url: buf, playbackRate: rate, fadeIn: dur * .45, fadeOut: dur * .45, curve: 'linear' });
+  g.connect(panners[(Math.random() * panners.length) | 0]);
+  g.onended = () => g.dispose();
+  g.start(time, pos, dur, amp);
+}
+
+let step = 0;
+function tick(time) {
+  if (!S.sound) return;
+  step++;
+  const s16 = step % 16;
+  if (s16 === 0) onBar();
+  if (S.mode === 'scrub') {
+    const n = 2;
+    for (let i = 0; i < n; i++) {
+      const jitter = (Math.random() - .5) * (.08 + S.grainSize * 2.2);
+      const rate = Math.random() < .12 ? .5 : (Math.random() < .08 ? 1.5 : 1);
+      grain(time + Math.random() * .03, S.head + jitter, S.grainSize, rate, .55);
+    }
+  } else if (S.mode === 'drift') {
+    if (rhythm[s16]) {
+      const burst = 2 + ((Math.random() * 3) | 0);
+      const size = .04 + Math.random() * .18;
+      for (let i = 0; i < burst; i++) grain(time + i * size * .35, S.driftPos + (Math.random() - .5) * .9, size, Math.random() < .2 ? .5 : 1, .45);
+    }
+  } else if (S.mode === 'surface') {
+    if (step % 6 === 0) grain(time, S.head + (Math.random() - .5) * 3, .05 + Math.random() * .06, 1, .18);
+  }
+}
+
+// every bar the serial engine decides what happens next
+function onBar() {
+  bar++;
+  if (bar % 4 === 0) rhythm = euclid(16, 3 + ((Math.random() * 7) | 0), (Math.random() * 4) | 0);
+  if (S.mode !== 'drift') return;
+  if (walkI >= walk.length) newWalk(walk[walk.length - 1]);
+  const line = LINES[walk[walkI++]];
+  S.driftPos = line.s + Math.random() * Math.max(.3, line.e - line.s);
+  S.head = S.driftPos; S.focus = line;
+  if (bar % 3 === 0 && Math.random() < .5) keyframe(5);
+  if (bar % 8 === 0) { if (!patternSeq.length) patternSeq = shuffle([0, 1, 2, 3]); setPattern(patternSeq.pop()); }
+  if (surfaceBars[bar % 8] && performance.now() - S.lastMove > 2500) Tone.Draw.schedule(() => surface(line), Tone.now());
+}
+
+// ---------- the surfaced voice ----------
+const voiceEl = document.getElementById('voice'), whoEl = document.getElementById('who'), vtext = document.getElementById('vtext');
+let surfaceTimer = 0;
+function surface(line) {
+  S.mode = 'surface'; S.focus = line; S.head = line.s; S.revealT = 1;
+  keyframe(10); nextKey = performance.now() + 2600;
+  whoEl.textContent = WHO[line.who] + ' · ' + fmt(line.s);
+  vtext.textContent = line.t;
+  voiceEl.classList.add('on');
+  const vt = vidTimeFor(line.s + .05);
+  if (vt != null) { seekVideo(vt, true); vid.playbackRate = 1; }
+  const dur = line.e - line.s + .35;
+  if (S.sound && audioReady) {
+    try { clear.stop(); } catch (e) {}
+    clear.start(undefined, line.s, dur);
+  }
+  S.surfaceEnd = performance.now() + dur * 1000;
+  clearTimeout(surfaceTimer);
+  surfaceTimer = setTimeout(endSurface, dur * 1000 + 300);
+  setState();
+}
+function endSurface() {
+  voiceEl.classList.remove('on');
+  if (S.mode === 'surface') {
+    S.mode = 'drift'; S.revealT = .2;
+    newWalk(LINES.indexOf(S.focus));
+  }
+  setState();
+}
+function breakSurface() {
+  if (S.mode !== 'surface') return;
+  clearTimeout(surfaceTimer);
+  if (audioReady) { try { clear.stop('+0.2'); } catch (e) {} }
+  voiceEl.classList.remove('on');
+}
+
+// ---------- video sync ----------
+let lastSeek = 0;
+function seekVideo(t, force) {
+  const now = performance.now();
+  if (!force && now - lastSeek < 280) return;
+  if (!isFinite(vid.duration)) return;
+  if (force || Math.abs(vid.currentTime - t) > .45) { try { vid.currentTime = Math.min(vid.duration - .1, t); } catch (e) {} lastSeek = now; }
+}
+
+// ---------- interaction ----------
+function moveTo(clientX, clientY) {
+  breakSurface();
+  S.mode = 'scrub'; S.revealT = .38; S.armed = true;
+  S.lastMove = performance.now();
+  S.head = Math.max(0, Math.min(DUR - .05, clientX / W * DUR));
+  S.grainSize = .02 + Math.pow(clientY / H, 1.6) * .3;
+  S.focus = lineAt(S.head);
+  const vt = vidTimeFor(S.head);
+  if (vt != null) S.revealT = .5;
+  if (vt != null) { seekVideo(vt); vid.playbackRate = 1; } else vid.playbackRate = .5;
+  setState();
+}
+let downAt = 0, downX = 0, downY = 0;
+stage.addEventListener('pointermove', e => moveTo(e.clientX, e.clientY));
+stage.addEventListener('pointerdown', e => { downAt = performance.now(); downX = e.clientX; downY = e.clientY; moveTo(e.clientX, e.clientY); });
+stage.addEventListener('pointerup', e => {
+  const quick = performance.now() - downAt < 260 && Math.hypot(e.clientX - downX, e.clientY - downY) < 8;
+  if (quick && e.pointerType === 'mouse') setPattern((S.pattern + 1) % 4);
+});
+addEventListener('keydown', e => {
+  if (!document.getElementById('door').classList.contains('gone')) return;
+  if (e.target.closest && e.target.closest('#index')) return;
+  if (e.key === 'p' || e.key === 'P') setPattern((S.pattern + 1) % 4);
+  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    const i = LINES.indexOf(lineAt(S.head)) + (e.key === 'ArrowRight' ? 1 : -1);
+    surface(LINES[(i + LINES.length) % LINES.length]); S.lastMove = performance.now();
+  }
+});
+
+const patBtn = document.getElementById('patBtn');
+const PATTERNS = ['xor', 'sierpinski', 'ikat', 'or'];
+function setPattern(i) { S.pattern = i; patBtn.textContent = 'Pattern ' + (i + 1); patBtn.title = 'Bit pattern: ' + PATTERNS[i] + ' (P to change)'; }
+patBtn.addEventListener('click', () => setPattern((S.pattern + 1) % 4));
+
+const stateEl = document.getElementById('state');
+function setState() {
+  stateEl.textContent = S.mode === 'scrub' ? 'travelling · hold still to listen' : S.mode === 'surface' ? 'listening' : 'drifting';
+}
+
+// sound toggle
+const sndBtn = document.getElementById('snd');
+async function soundOn() {
+  sndBtn.disabled = true;
+  try {
+    if (!audioReady) await setupAudio();
+    S.sound = true; Tone.Destination.mute = false;
+  } catch (err) {
+    console.warn('Audio could not start', err);
+    S.sound = false;
+  }
+  sndBtn.disabled = false; syncSnd();
+}
+function soundOff() { S.sound = false; if (audioReady) { Tone.Destination.mute = true; } syncSnd(); }
+function syncSnd() { sndBtn.textContent = S.sound ? 'Sound on' : 'Sound off'; sndBtn.setAttribute('aria-pressed', String(S.sound)); }
+sndBtn.addEventListener('click', () => S.sound ? soundOff() : soundOn());
+
+// threshold
+const door = document.getElementById('door');
+function openDoor() { door.classList.add('gone'); vid.play().catch(() => {}); }
+document.getElementById('enter').addEventListener('click', async e => {
+  e.currentTarget.disabled = true; e.currentTarget.textContent = 'Loading the voices…';
+  await soundOn(); openDoor();
+});
+document.getElementById('quiet').addEventListener('click', openDoor);
+
+// index
+const idx = document.getElementById('index'), idxBtn = document.getElementById('idxBtn'), idxList = document.getElementById('idxList');
+LINES.forEach(l => {
+  const li = document.createElement('li'); li.className = l.who;
+  const b = document.createElement('button'); b.type = 'button';
+  b.innerHTML = '<span class="t">' + fmt(l.s) + '</span><span></span>';
+  b.lastChild.textContent = l.t;
+  b.addEventListener('click', () => { closeIdx(); S.lastMove = performance.now(); surface(l); });
+  li.appendChild(b); idxList.appendChild(li);
+});
+function closeIdx() { idx.hidden = true; idxBtn.setAttribute('aria-expanded', 'false'); }
+idxBtn.addEventListener('click', () => { idx.hidden = !idx.hidden; idxBtn.setAttribute('aria-expanded', String(!idx.hidden)); });
+document.getElementById('idxClose').addEventListener('click', closeIdx);
+
+// timeline
+const tl = document.getElementById('tl');
+[[0, 40], [125.5, 163]].forEach(([a, b]) => { const d = document.createElement('div'); d.className = 'seg'; d.style.left = (a / DUR * 100) + '%'; d.style.width = ((b - a) / DUR * 100) + '%'; tl.appendChild(d); });
+LINES.filter(l => l.who === 'voice').forEach(l => { const d = document.createElement('div'); d.className = 'tick'; d.style.left = (l.s / DUR * 100) + '%'; tl.appendChild(d); });
+const headEl = document.createElement('div'); headEl.className = 'head'; tl.appendChild(headEl);
+const clockEl = document.getElementById('clock');
+
+// ---------- frame loop ----------
+function frame(now) {
+  // hold still to listen
+  if (S.mode === 'scrub' && S.armed && now - S.lastMove > 1100) { S.armed = false; surface(lineAt(S.head)); }
+  if (S.mode === 'scrub' && now - S.lastMove > 9000) { S.mode = 'drift'; S.revealT = .2; setState(); }
+  // play along during a surfaced line
+  if (S.mode === 'surface') {
+    const p = Math.min(1, 1 - (S.surfaceEnd - now) / ((S.focus.e - S.focus.s + .35) * 1000));
+    S.head = S.focus.s + (S.focus.e - S.focus.s) * Math.max(0, p);
+  }
+  if (S.mode === 'drift') {
+    const vt = vidTimeFor(S.driftPos);
+    if (vt != null && Math.abs(vid.currentTime - vt) > 4) seekVideo(vt);
+    vid.playbackRate = vt != null ? .75 : .45;
+  }
+  const raw = audioReady && S.sound ? Math.min(1, Math.max(0, meter.getValue() * 1.8)) : (.08 + .05 * Math.sin(now / 900));
+  S.level += (raw - S.level) * .18;
+  S.reveal += (S.revealT - S.reveal) * .05;
+  const lineWarm = S.head > 174 && S.head < 188 ? 1 : 0;
+  S.warm += (Math.max(S.warmBase * .6, lineWarm) - S.warm) * .02;
+  headEl.style.left = (S.head / DUR * 100) + '%';
+  clockEl.textContent = fmt(S.head);
+  drawSources(now);
+  if (fallback) drawFallback(now);
+  requestAnimationFrame(frame);
+}
+
+// ---------- boot ----------
+resize();
+let evalOk = true;
+try { evalOk = new Function('return 1')() === 1; } catch (e) { evalOk = false; }
+try { if (!evalOk || !window.Hydra || location.hash === '#flat') throw new Error('Hydra unavailable'); setupHydra(); } catch (err) { console.warn('Hydra unavailable, using 2D fallback', err); hydra = null; setupFallback(); }
+addEventListener('resize', resize);
+vid.play().catch(() => {});
+setPattern(0); setState();
+if (document.fonts && document.fonts.load) document.fonts.load('400 12px "Space Mono"').catch(() => {});
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
