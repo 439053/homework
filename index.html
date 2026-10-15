@@ -16,13 +16,13 @@
 <style>
 /* Layout: one full-bleed screen. The image is the floor; type sits on it like signage in a corridor. */
 :root {
-  --night: #2a1d29;        /* plum, the darkest cell of the pattern */
-  --shirt: #c9dcec;        /* uniform blue */
+  --night: #220005;        /* oxblood, after hours */
+  --shirt: #e0fe00;        /* uniform blue */
   --wall: #d8b48c;         /* the room's beige wall */
-  --badge: #f2c200;        /* name badge yellow */
-  --ink: #eef3f7;
-  --dim: rgba(201, 220, 236, .55);
-  --line: rgba(201, 220, 236, .22);
+  --badge: #e0fe00;        /* name badge yellow */
+  --ink: #f6f1ea;
+  --dim: rgba(246, 241, 234, .58);
+  --line: rgba(246, 241, 234, .24);
   --display: "Fraunces", Georgia, serif;
   --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
   --mono: "Space Mono", ui-monospace, Menlo, monospace;
@@ -42,8 +42,8 @@ body {
 #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 #vid, #vidc, #wordc { display: none; }
 .veil { position: fixed; left: 0; right: 0; z-index: 1; pointer-events: none; }
-.veil.t { top: 0; height: 110px; background: linear-gradient(rgba(42, 29, 41, .7), rgba(42, 29, 41, 0)); }
-.veil.b { bottom: 0; height: 46vh; background: linear-gradient(rgba(42, 29, 41, 0), rgba(42, 29, 41, .55) 45%, rgba(42, 29, 41, .85)); }
+.veil.t { top: 0; height: 110px; background: linear-gradient(rgba(34, 0, 5, .7), rgba(34, 0, 5, 0)); }
+.veil.b { bottom: 0; height: 46vh; background: linear-gradient(rgba(34, 0, 5, 0), rgba(34, 0, 5, .55) 45%, rgba(34, 0, 5, .85)); }
 
 /* ---------- chrome ---------- */
 .chrome {
@@ -58,7 +58,7 @@ body {
 .tools { display: flex; gap: 6px; pointer-events: auto; }
 button {
   font: inherit; white-space: nowrap; font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--ink); background: rgba(42, 29, 41, .55); border: 1px solid var(--line);
+  color: var(--ink); background: rgba(34, 0, 5, .55); border: 1px solid var(--line);
   padding: 7px 10px; border-radius: 0; cursor: pointer; backdrop-filter: blur(6px);
 }
 button:hover { border-color: var(--shirt); }
@@ -80,7 +80,7 @@ button[aria-pressed="true"] { background: var(--shirt); color: var(--night); }
 #voice p {
   font-family: var(--display); font-style: italic; font-weight: 400;
   font-size: clamp(24px, 3.4vw, 46px); line-height: 1.12; text-wrap: balance;
-  color: var(--ink); text-shadow: 0 0 24px rgba(42, 29, 41, .9), 0 0 2px rgba(42, 29, 41, .9);
+  color: var(--ink); text-shadow: 0 0 24px rgba(34, 0, 5, .9), 0 0 2px rgba(34, 0, 5, .9);
 }
 
 /* ---------- timeline ---------- */
@@ -100,7 +100,7 @@ button[aria-pressed="true"] { background: var(--shirt); color: var(--night); }
 /* ---------- index drawer ---------- */
 #index {
   position: fixed; z-index: 5; top: 0; right: 0; bottom: 0; width: min(440px, 100%);
-  background: rgba(42, 29, 41, .94); border-left: 1px solid var(--line);
+  background: rgba(34, 0, 5, .94); border-left: 1px solid var(--line);
   overflow-y: auto; overscroll-behavior: contain;
   padding-block: calc(16px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px));
   padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px));
@@ -125,7 +125,7 @@ button[aria-pressed="true"] { background: var(--shirt); color: var(--night); }
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 24px calc(40px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(to top, rgba(42, 29, 41, .92) 0%, rgba(42, 29, 41, .55) 55%, rgba(42, 29, 41, .15) 100%);
+  background: linear-gradient(to top, rgba(34, 0, 5, .92) 0%, rgba(34, 0, 5, .55) 55%, rgba(34, 0, 5, .15) 100%);
   transition: opacity 1.2s ease;
 }
 #door.gone { opacity: 0; pointer-events: none; }
@@ -485,7 +485,7 @@ function drawSources(now) {
       const c = Math.abs(b - mean) * 4.2;
       if (c < .18) continue;
       wctx.globalAlpha = Math.min(1, c);
-      wctx.fillStyle = b > mean + .22 ? '#f2c200' : '#c9dcec';
+      wctx.fillStyle = b > mean + .22 ? '#e0fe00' : '#e6d6cf';
       wctx.fillText(chars[k % n], i * GLYPH.w, j * GLYPH.h);
       k++;
     }
@@ -588,7 +588,7 @@ function setupHydra() {
       vec2 p = _st; float t = time * speed;
       float n = sin(p.x * 3.1 + t) * .5 + sin(p.y * 2.3 - t * 1.3) * .5 + sin((p.x + p.y) * 4.7 + t * .7) * .3;
       n = n * .3 + .5;
-      vec3 rose = vec3(.87, .74, .79), mauve = vec3(.70, .56, .64), lilac = vec3(.68, .63, .74), peach = vec3(.93, .79, .69);
+      vec3 rose = vec3(.29, .02, .06), mauve = vec3(.216, .004, .035), lilac = vec3(.17, .0, .03), peach = vec3(.36, .06, .04);
       vec3 c = mix(mauve, rose, smoothstep(.25, .8, n));
       c = mix(c, lilac, smoothstep(.45, 1., p.y + .2 * sin(t + p.x * 2.)) * .45);
       c = mix(c, peach, warm * .65 * smoothstep(.1, .9, 1. - p.y));
@@ -601,7 +601,7 @@ function setupHydra() {
     inputs: [{ type: 'float', name: 'amt', default: .55 }],
     glsl: `
       float v = _luminance(_c1.rgb);
-      vec3 plum = vec3(.29, .2, .28);
+      vec3 plum = vec3(.10, .0, .015);
       return vec4(mix(_c0.rgb, plum, v * amt), _c0.a);`
   });
   const bgCell = () => Math.round(S.cell * 1.5);
@@ -690,8 +690,8 @@ function drawFallback(now) {
   mctx.putImageData(img, 0, 0);
   const t = now / 1000;
   fctx.globalCompositeOperation = 'source-over';
-  fctx.fillStyle = 'rgba(178,143,163,.25)'; fctx.fillRect(0, 0, CW, CH);
-  const warmCol = S.warm > .5 ? '237,201,176' : '222,189,201';
+  fctx.fillStyle = 'rgba(55,1,9,.25)'; fctx.fillRect(0, 0, CW, CH);
+  const warmCol = S.warm > .5 ? '92,15,10' : '74,5,15';
   for (let i = 0; i < 3; i++) {
     const gx = CW * (.5 + .3 * Math.sin(t * .2 + i * 2)), gy = CH * (.5 + .25 * Math.cos(t * .17 + i));
     const g = fctx.createRadialGradient(gx, gy, 0, gx, gy, Math.max(CW, CH) * (.25 + S.level));
