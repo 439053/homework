@@ -10,8 +10,7 @@
 @font-face { font-family: "Fraunces"; src: url("fonts/fraunces-latin-full-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
 @font-face { font-family: "Instrument Sans"; src: url("fonts/instrument-sans-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 @font-face { font-family: "Instrument Sans"; src: url("fonts/instrument-sans-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
-@font-face { font-family: "Space Mono"; src: url("fonts/space-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
-@font-face { font-family: "Space Mono"; src: url("fonts/space-mono-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Syne Mono"; src: url("fonts/syne-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
 </style>
 <style>
 /* Layout: one full-bleed screen. The image is the floor; type sits on it like signage in a corridor. */
@@ -25,7 +24,7 @@
   --line: rgba(246, 241, 234, .24);
   --display: "Fraunces", Georgia, serif;
   --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
-  --mono: "Space Mono", ui-monospace, Menlo, monospace;
+  --mono: "Syne Mono", ui-monospace, Menlo, monospace;
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -54,6 +53,8 @@ body {
 }
 .top { top: 0; padding-block: calc(14px + env(safe-area-inset-top, 0px)) 0; }
 .mark { font-family: var(--display); font-style: italic; font-size: 18px; letter-spacing: .01em; color: var(--ink); mix-blend-mode: difference; }
+.mark a { color: inherit; text-decoration: none; pointer-events: auto; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.mark a:hover, .mark a:focus-visible { text-decoration: underline; outline: none; }
 .mark small { font-family: var(--mono); font-style: normal; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin-left: 10px; }
 .tools { display: flex; gap: 6px; pointer-events: auto; }
 button {
@@ -124,19 +125,23 @@ button[aria-pressed="true"] { background: var(--shirt); color: var(--night); }
   position: fixed; inset: 0; z-index: 6; display: flex; align-items: flex-end;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 24px calc(40px + env(safe-area-inset-bottom, 0px));
+  padding-block: 24px calc(76px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(to top, rgba(34, 0, 5, .92) 0%, rgba(34, 0, 5, .55) 55%, rgba(34, 0, 5, .15) 100%);
   transition: opacity 1.2s ease;
 }
 #door.gone { opacity: 0; pointer-events: none; }
-.door-in { display: grid; gap: 22px; max-width: 640px; }
+.door-in { display: grid; gap: 22px; max-width: 640px; position: relative; z-index: 1; }
+.chrome-title { position: absolute; z-index: 0; pointer-events: none; }
+.door-in h1.chromed, .door-in h1.chromed em { color: transparent; }
 .door-in .eyebrow { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--badge); }
 .door-in h1 { font-family: var(--display); font-weight: 400; font-size: clamp(54px, 11vw, 132px); line-height: .86; letter-spacing: -.02em; }
 .door-in h1 em { font-style: italic; color: var(--shirt); }
 .door-in p { font-size: 12.5px; line-height: 1.7; color: var(--shirt); max-width: 52ch; }
 .door-in p i { font-family: var(--display); font-size: 1.15em; color: var(--ink); }
 .door-in .find { font-size: 10.5px; line-height: 1.6; letter-spacing: .04em; font-weight: 400; color: var(--ink); max-width: 60ch; }
-.door-in .credit { font-family: var(--display); font-style: italic; font-size: 15px; color: var(--shirt); }
+.door-in .credit { font-family: var(--display); font-style: italic; font-size: 12.5px; color: var(--shirt); }
+.door-in .credit a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgba(224, 254, 0, .45); }
+.door-in .credit a:hover, .door-in .credit a:focus-visible { text-decoration-color: currentColor; outline: none; }
 .door-in ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: 10.5px; color: var(--dim); letter-spacing: .04em; }
 .door-in ul b { color: var(--ink); font-weight: 400; }
 .door-in .row { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -170,7 +175,7 @@ button, .readout, .eyebrow, #voice .who { font-family: var(--mono); }
 
 <div class="veil t"></div><div class="veil b"></div>
 <div class="chrome top">
-  <div class="mark">Home(work) <small>Goodman Arts Centre</small></div>
+  <div class="mark"><a href="https://ch3rrychan.github.io/homework/" title="Back to the start">Home(work)</a> <small>Goodman Arts Centre</small></div>
   <div class="tools">
     <button id="patBtn" type="button" title="Change the bit pattern (P)">Pattern 1</button>
     <button id="idxBtn" type="button" aria-expanded="false" aria-controls="index">Index</button>
@@ -200,7 +205,7 @@ button, .readout, .eyebrow, #voice .who { font-family: var(--mono); }
     <div class="eyebrow">Goodman Arts Centre &middot; The Custodians</div>
     <h1>Home(<em>work</em>)</h1>
     <p><i>Home(work)</i> returns our attention to the custodians who hold Goodman together. Conversations broken into grains of sound, shifting pattern and smeared frames. Their voices drift and fade, the way their work often goes unseen, a rhythm of care.</p>
-    <p class="find">Seek the installations at Blk G, Blk B and Blk O on 24 Oct 2026, 4pm &ndash; 10pm.</p>
+    <p class="find">Physical nodes activate across Block G and Block B on 24 Oct.</p>
     <ul>
       <li><b>Move</b> &nbsp;to travel through the recording</li>
       <li><b>Hold still</b> &nbsp;and a voice comes through</li>
@@ -210,7 +215,7 @@ button, .readout, .eyebrow, #voice .who { font-family: var(--mono); }
       <button id="enter" type="button">Enter with sound</button>
       <button id="quiet" type="button">Enter in silence</button>
     </div>
-    <div class="credit">by a.syadiq with Cherry Chan</div>
+    <div class="credit">Artists: <a href="https://www.instagram.com/thefakecherry" target="_blank" rel="noopener">Cherry Chan</a> &amp; <a href="https://www.instagram.com/a.syadiq/" target="_blank" rel="noopener">a.syadiq</a></div>
   </div>
 </section>
 
@@ -471,7 +476,7 @@ function drawSources(now) {
   for (let o = 0; o < px.length; o += 16) { const b = (px[o] * .3 + px[o + 1] * .55 + px[o + 2] * .15) / 255; if (b > .04) { sum += b; cnt++; } }
   const mean = cnt ? sum / cnt : .5;
   wctx.clearRect(0, 0, CW, CH);
-  wctx.font = `400 ${Math.round(GLYPH.h * .82)}px "Space Mono", monospace`;
+  wctx.font = `400 ${Math.round(GLYPH.h * .82)}px "Syne Mono", monospace`;
   wctx.textBaseline = 'top';
   const chars = S.focus.t.replace(/\s+/g, '').toUpperCase();
   const n = chars.length;
@@ -955,9 +960,10 @@ try { if (!evalOk || !window.Hydra || location.hash === '#flat') throw new Error
 addEventListener('resize', resize);
 vid.play().catch(() => {});
 setPattern(0); setState();
-if (document.fonts && document.fonts.load) document.fonts.load('400 12px "Space Mono"').catch(() => {});
+if (document.fonts && document.fonts.load) document.fonts.load('400 12px "Syne Mono"').catch(() => {});
 requestAnimationFrame(frame);
 })();
 </script>
+<script src="chrome-title.js"></script>
 </body>
 </html>
