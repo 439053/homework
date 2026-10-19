@@ -1,11 +1,11 @@
-# Home(work)
+# same air
 
-**Artists: Cherry Chan & a.syadiq**
-Goodman Arts Centre · The Custodians · 24 Oct 2026, 4pm – 10pm
+**Cherry Chan, 2026** · *A companion to Home(work) by a.syadiq*
+HOME | GROUND 2026 · Goodman Arts Centre · 24 Oct 2026
 
-*Home(work)* returns our attention to the custodians who hold Goodman together. Conversations broken into grains of sound, shifting pattern and smeared frames. Their voices drift and fade, the way their work often goes unseen, a rhythm of care.
+Drawing on oral history interviews with Goodman Arts Centre's custodians, *same air* disperses their recollections of routine, friendship and care into an online listening space. Their voices are broken into grains of sound and surface only briefly, as they might in passing along a corridor. The work also responds to Singapore's live air-quality readings: as haze thickens, the custodians grow harder to reach.
 
-Physical nodes activate across Block G and Block B on 24 Oct.
+Voices: Osman, Miskam, Navina, Rimashini, Dorothy Neo. Interviews: Velda Phua, assisted by a.syadiq, for *kiss the raindrops*. Air-quality data: National Environment Agency, via data.gov.sg.
 
 ---
 
@@ -15,6 +15,7 @@ Physical nodes activate across Block G and Block B on 24 Oct.
 |---|---|
 | `index.html` | The whole piece: layout, text, visuals and sound logic |
 | `chrome-title.js` | The big title's chrome burst on the opening screen |
+| `haze.js`, `air.json` | The live haze; `air.json` is refreshed hourly by the GitHub Action in `.github/` |
 | `media/cut.mp4`, `media/cut.webm` | The custodians' footage, cut out of the room (colour on top, transparency matte below) |
 | `media/voices.mp3` | The full 3 min 13 s recording |
 | `vendor/` | Local copies of Hydra (visuals), Tone.js (sound) and Total Serialism (remix engine) |
@@ -29,7 +30,8 @@ The page needs nothing from the internet beyond this folder.
 Open `index.html` in any text editor (or on GitHub, click the file, then the pencil icon).
 
 - Opening paragraph: search for `returns our attention`
-- Event line: search for `Physical nodes`
+- Companion line: search for `A companion to`
+- Credits panel: search for `id="credits"`
 - Credit: search for `class="credit"`
 - Everything said in the recording, with timings: search for `const LINES`
 

@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Home(work) by a.syadiq with Cherry Chan. Conversations with the custodians of Goodman Arts Centre, broken into grains of sound, shifting pattern and smeared frames.">
-<title>Home(work)</title>
+<meta name="description" content="same air by Cherry Chan, a companion to Home(work) by a.syadiq. The voices of Goodman Arts Centre's custodians, dispersed into an online listening space that responds to Singapore's live air.">
+<title>same air</title>
 <style>
 @font-face { font-family: "Fraunces"; src: url("fonts/fraunces-latin-full-normal.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
 @font-face { font-family: "Fraunces"; src: url("fonts/fraunces-latin-full-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
@@ -117,9 +117,24 @@ button[aria-pressed="true"] { background: var(--shirt); color: var(--night); }
 #index li button:hover span:last-child { color: var(--badge); }
 #index li .t { color: var(--dim); font-variant-numeric: tabular-nums; font-size: 10px; padding-top: 2px; }
 #index li.cam .t { color: var(--badge); }
-#index .airline { font-family: var(--mono); font-size: 9px; letter-spacing: .08em; color: var(--dim); opacity: .55; margin: 0 0 14px; font-variant-numeric: tabular-nums; }
+#airline { text-transform: none; }
+#airline::before { content: " \00b7  "; }
 #index .legend { color: var(--dim); font-size: 10px; line-height: 1.6; margin-bottom: 16px; max-width: 46ch; }
 #index .legend i { font-style: normal; color: var(--badge); }
+#credits {
+  position: fixed; z-index: 5; top: 0; right: 0; bottom: 0; width: min(440px, 100%);
+  background: rgba(34, 0, 5, .94); border-left: 1px solid var(--line);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding-block: calc(16px + env(safe-area-inset-top, 0px)) calc(24px + env(safe-area-inset-bottom, 0px));
+  padding-left: 20px; padding-right: max(20px, env(safe-area-inset-right, 0px));
+}
+#credits header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 22px; }
+#credits h2 { font-family: var(--display); font-style: italic; font-weight: 400; font-size: 26px; }
+#credits dl { margin: 0; display: grid; gap: 6px; }
+#credits dt { font-family: var(--mono); font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--badge); padding-top: 14px; border-top: 1px solid var(--line); }
+#credits dd { margin: 0 0 4px; font-size: 13px; line-height: 1.65; color: var(--ink); }
+#credits dd i { color: var(--dim); }
+#credits a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: rgba(224, 254, 0, .45); }
 
 /* ---------- threshold ---------- */
 #door {
@@ -161,7 +176,7 @@ button[aria-pressed="true"] { background: var(--shirt); color: var(--night); }
   #voice, #door { transition: none; }
 }
 /* Fraunces at its softest, slightly wonky setting */
-h1, #voice p, .mark, .credit, #index h2, .door-in p i { font-variation-settings: "SOFT" 100, "WONK" 1; }
+h1, #voice p, .mark, .credit, #index h2, #credits h2, .door-in p i { font-variation-settings: "SOFT" 100, "WONK" 1; }
 .door-in h1 { font-weight: 340; letter-spacing: -.035em; }
 #voice p { font-weight: 360; }
 .door-in p { font-size: 13.5px; line-height: 1.55; }
@@ -176,10 +191,11 @@ button, .readout, .eyebrow, #voice .who { font-family: var(--mono); }
 
 <div class="veil t"></div><div class="veil b"></div>
 <div class="chrome top">
-  <div class="mark"><a href="./" title="Back to the start">Home(work)</a> <small>Digital Artefact. Physical Nodes 📍 Goodman Arts Centre</small></div>
+  <div class="mark"><a href="./" title="Back to the start">same air</a> <small>Listening space · Goodman Arts Centre</small></div>
   <div class="tools">
     <button id="patBtn" type="button" title="Change the bit pattern (P)">Pattern 1</button>
     <button id="idxBtn" type="button" aria-expanded="false" aria-controls="index">Index</button>
+    <button id="crBtn" type="button" aria-expanded="false" aria-controls="credits">Credits</button>
     <button id="snd" type="button" aria-pressed="false">Sound off</button>
   </div>
 </div>
@@ -190,24 +206,39 @@ button, .readout, .eyebrow, #voice .who { font-family: var(--mono); }
   <div class="readout">
     <span id="state">drifting</span>
     <span><b id="clock">00:00</b> / 03:13</span>
-    <span id="hour"></span>
+    <span><span id="hour"></span><span id="airline" hidden></span></span>
   </div>
   <div id="tl"><div class="base"></div></div>
 </div>
 
 <aside id="index" hidden aria-label="Index of everything said">
   <header><h2>Everything said</h2><button id="idxClose" type="button">Close</button></header>
-  <p class="airline" id="airline" hidden></p>
   <p class="legend">Three minutes and thirteen seconds. Lines marked <i>yellow</i> are the two custodians, on camera. The rest is a voice heard off camera, someone who studied here and now works here. Choose a line to send the piece there.</p>
   <ol id="idxList"></ol>
 </aside>
 
+<aside id="credits" class="panel" hidden aria-label="Credits">
+  <header><h2>same air</h2><button id="crClose" type="button">Close</button></header>
+  <dl>
+    <dt>Artist</dt>
+    <dd><a href="https://www.instagram.com/thefakecherry" target="_blank" rel="noopener">Cherry Chan</a>, 2026<br><i>A companion to Home(work) by <a href="https://www.instagram.com/a.syadiq/" target="_blank" rel="noopener">a.syadiq</a></i></dd>
+    <dt>Voices</dt>
+    <dd>Osman, Caretaker (2018 – present)<br>Miskam, Caretaker (2023 – present)<br>Navina, Caretaker (2026 – present)<br>Rimashini, Tea lady (2025 – present)<br>Dorothy Neo, Place Manager (2018 – present)</dd>
+    <dt>Interviews</dt>
+    <dd>Velda Phua, assisted by a.syadiq<br>Undertaken for <i>kiss the raindrops</i>, a series of six presentations exploring the lives and histories connected to Goodman Arts Centre</dd>
+    <dt>Presented as part of</dt>
+    <dd>HOME | GROUND 2026, Goodman Arts Centre</dd>
+    <dt>Air-quality data</dt>
+    <dd>National Environment Agency, via data.gov.sg</dd>
+  </dl>
+</aside>
+
 <section id="door">
   <div class="door-in">
-    <div class="eyebrow">Goodman Arts Centre &middot; The Custodians</div>
-    <h1>Home(<em>work</em>)</h1>
-    <p><i>Home(work)</i> returns our attention to the custodians who hold Goodman together. Conversations broken into grains of sound, shifting pattern and smeared frames. Their voices drift and fade, the way their work often goes unseen, a rhythm of care.</p>
-    <p class="find">Physical nodes activate across Block G and Block B on 24 Oct.</p>
+    <div class="eyebrow">HOME | GROUND 2026 &middot; Goodman Arts Centre</div>
+    <h1>same <em>air</em></h1>
+    <p>Drawing on oral history interviews with Goodman Arts Centre's custodians, <i>same air</i> disperses their recollections of routine, friendship and care into an online listening space. Their voices are broken into grains of sound and surface only briefly, as they might in passing along a corridor. The work also responds to Singapore's live air-quality readings: as haze thickens, the custodians grow harder to reach.</p>
+    <p class="find">A companion to <i>Home(work)</i> by a.syadiq, at Blk G and Blk B on 24 Oct.</p>
     <ul>
       <li><b>Move</b> &nbsp;to travel through the recording</li>
       <li><b>Hold still</b> &nbsp;and a voice comes through</li>
@@ -217,7 +248,7 @@ button, .readout, .eyebrow, #voice .who { font-family: var(--mono); }
       <button id="enter" type="button">Enter with sound</button>
       <button id="quiet" type="button">Enter in silence</button>
     </div>
-    <div class="credit">Artists: <a href="https://www.instagram.com/thefakecherry" target="_blank" rel="noopener">Cherry Chan</a> &amp; <a href="https://www.instagram.com/a.syadiq/" target="_blank" rel="noopener">a.syadiq</a></div>
+    <div class="credit">Artist: <a href="https://www.instagram.com/thefakecherry" target="_blank" rel="noopener">Cherry Chan</a></div>
   </div>
 </section>
 
@@ -1001,5 +1032,15 @@ requestAnimationFrame(frame);
 </script>
 <script src="chrome-title.js"></script>
 <script src="haze.js"></script>
+<script>
+// credits panel
+(() => {
+  const p = document.getElementById('credits'), b = document.getElementById('crBtn'), i = document.getElementById('index');
+  const close = () => { p.hidden = true; b.setAttribute('aria-expanded', 'false'); };
+  b.addEventListener('click', () => { const open = p.hidden; if (open) { i.hidden = true; document.getElementById('idxBtn').setAttribute('aria-expanded', 'false'); } p.hidden = !open; b.setAttribute('aria-expanded', String(open)); });
+  document.getElementById('crClose').addEventListener('click', close);
+  document.getElementById('idxBtn').addEventListener('click', close);
+})();
+</script>
 </body>
 </html>

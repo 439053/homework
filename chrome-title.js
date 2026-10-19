@@ -102,7 +102,8 @@
     if ('letterSpacing' in tctx) tctx.letterSpacing = ls + 'px';
     tctx.textBaseline = 'alphabetic';
     const x0 = r.left - band.x, base = r.top - band.y + r.height * .5 + fs * .3;
-    const parts = [['Home(', 'normal', false], ['work', 'italic', true], [')', 'normal', false]];
+    // the title's words, taken from the heading itself; italic parts (<em>) get the accent colour
+    const parts = [...h1.childNodes].map(n => n.nodeType === 3 ? [n.textContent, 'normal', false] : [n.textContent, 'italic', true]).filter(p => p[0].length);
     let x = x0;
     for (const [t, style, isWork] of parts) {
       tctx.font = `${style} ${weight} ${fs}px ${fam}`;

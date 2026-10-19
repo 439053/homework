@@ -1,5 +1,5 @@
 // Haze: reads the latest Singapore air readings from air.json (refreshed hourly by a GitHub Action)
-// and turns them into the drifting, staining haze, the tightening weave, and the quiet number in the Index.
+// and turns them into the drifting, staining haze, the tightening weave, and the reading in the bottom bar.
 (() => {
   'use strict';
   // what the visuals read every frame
@@ -20,7 +20,7 @@
     const pm = d.pm25 || {};
     const vals = REGIONS.map(k => pm[k]).filter(v => v >= 0);
     if (!vals.length) return false;
-    const top = Math.max(...vals);
+    const top = pm.east >= 0 ? pm.east : Math.max(...vals);   // Goodman Road is in the East region
     const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
     const rel = k => (pm[k] >= 0 && mean > 0) ? pm[k] / mean : 1;
     target.amt = strength(top);
@@ -32,7 +32,7 @@
       target.vx = Math.sin(to) * k; target.vy = Math.cos(to) * k;
     }
     const el = document.getElementById('airline');
-    if (el) { el.textContent = String(Math.round(top)); el.hidden = false; }
+    if (el) { el.textContent = Math.round(top) + ' \u00b5g/m\u00b3'; el.hidden = false; }
     return true;
   }
 
